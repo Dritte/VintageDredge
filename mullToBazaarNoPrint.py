@@ -1,6 +1,6 @@
 import random
 
-attempts = 1000
+attempts = 100000
 failures = 0
 count = 0
 x=[]

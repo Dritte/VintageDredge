@@ -20,14 +20,24 @@ def success_probability(hand_size, powders_in_deck, library_size):
     return success_probabilities[(hand_size, powders_in_deck, library_size)]
   probability_draw_bazaar = 1.0 - (choose(library_size - 4, hand_size) * 1.0) / choose(library_size, hand_size)
 
-(Probability that you don't and draw no Serum Powder) * (Probability
-of success if you draw non of the 4-of and no Serum powder) +
-(Probability that you don't and draw one Serum Powder) * (Probability
-of success if you draw non of the 4-of and one Serum powder) +
-(Probability that you don't and draw two Serum Powder) * (Probability
-of success if you draw non of the 4-of and two Serum powder) +
-(Probability that you don't and draw three Serum Powder) *
-(Probability of success if you draw non of the 4-of and three Serum
-powder) + (Probability that you don't and draw four Serum Powder) *
-(Probability of success if you draw non of the 4-of and four Serum
-powder).
+  probability_no_bazaar_and_k_powder = [0.0] * powders_in_deck
+  
+  for powders_drawn in range(powders_in_deck + 1):
+    probability_no_bazaar_and_k_powder[powders_drawn] = choose(powders_in_deck, powders_drawn) * choose()
+
+  probability_that_you_dont_and_draw_no_serum_powder = 0.0
+  probability_of_success_if_you_draw_none_of_the_bazaar_and_no_serum_powder = 0.0 
+  
+  probability_that_you_dont_and_draw_one_serum_powder = 0.0
+  probability_of_success_if_you_draw_none_of_the_bazaar_and_one_serum_powder = 0.0 
+  
+  probability_that_you_dont_and_draw_two_serum_powder = 0.0
+  probability_of_success_if_you_draw_none_of_the_bazaar_and_two_serum_powder = 0.0 
+  
+  probability_that_you_dont_and_draw_three_serum_powder = 0.0
+  probability_of_success_if_you_draw_none_of_the_bazaar_and_three_serum_powder = 0.0 
+  
+  probability_that_you_dont_and_draw_four_serum_powder = 0.0
+  probability_of_success_if_you_draw_none_of_the_bazaar_and_four_serum_powder = 0.0 
+
+  
