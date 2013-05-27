@@ -7,6 +7,7 @@ not a randomized simulation.
 
 tl;dr Pr[Finding Bazaar] = 0.941681291934
 
+by Eugenio Fortanely
  """
 
 initial_hand_size = 7
