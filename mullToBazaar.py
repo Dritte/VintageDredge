@@ -1,7 +1,12 @@
 
 """
 The following is an calculation of the probability of finding a 
-4-of Bazaar of Baghdad in Vintage Dredge with 4 Serum Powders
+4-of Bazaar of Baghdad in the opening hand of a 60 card Vintage 
+Dredge Deck with 4 Serum Powders. This is combinatorial calculation, 
+not a randomized simulation.
+
+tl;dr Pr[Finding Bazaar] = 0.941681291934
+
  """
 
 initial_hand_size = 7
@@ -42,33 +47,41 @@ def success_probability(hand_size, powders_in_deck, library_size):
 
   probability_of_success =  0.0
   num_possible_hands_without_bazaar = (choose(library_size - 4, hand_size) * 1.0)
-  probability_draw_bazaar = 1.0 -  num_possible_hands_without_bazaar / choose(library_size, hand_size)
+  num_possible_hands = choose(library_size, hand_size)
+  probability_draw_bazaar =  \
+    1.0 -  num_possible_hands_without_bazaar / num_possible_hands
   probability_of_success += probability_draw_bazaar
   for powders_drawn in range(powders_in_deck + 1):
-    probability_no_bazaar_and_k_powder= (choose(powders_in_deck, powders_drawn) * 1.0) * \
-                                         (choose(library_size - powders_in_deck - 4, hand_size - powders_drawn) * 1.0 ) / \
-                                         (choose(library_size, hand_size) * 1.0)
-    probability_mulligan_success = success_probability(hand_size - 1, powders_in_deck, library_size)                                                    
+    probability_no_bazaar_and_k_powder= \
+      (choose(powders_in_deck, powders_drawn) * 1.0) * \
+      choose(library_size - powders_in_deck - 4, hand_size - powders_drawn) / \
+      choose(library_size, hand_size)
+    probability_mulligan_success = \
+      success_probability(hand_size - 1, powders_in_deck, library_size)                                                    
     if powders_drawn > 0:
-      probability_powder_success = success_probability(hand_size, powders_in_deck - powders_drawn, library_size - hand_size)
+      probability_powder_success = \
+        success_probability(hand_size, powders_in_deck - powders_drawn, library_size - hand_size)
     else:
       probability_powder_success = 0.0
-    ## Uncommenting the following lines will show for what combinations of hand size, powders in deck and library size 
-    ## where a success is more likely by mulliganing than using Serum Powder if a Serum Powder is drawn.
-    ## Spoiler alert: It never is
+    ## Uncommenting the following lines will show for what combinations of hand 
+    ## size, powders in deck and library size where a success is more likely by 
+    ## mulliganing than using Serum Powder if a Serum Powder is drawn.
+    ## Spoiler alert: It never is for a 60 card deck, but is neccessary for 
+    ## completeness for very large library sizes that this program could be used to analyze.
     ##if powders_drawn > 0:
     ##  if probability_mulligan_success > probability_powder_success:
     ##    print "(hand_size, powders_in_deck, library_size)"
     ##    print (hand_size, powders_in_deck, library_size)
     ##    print "MULLIGAN"
-    probability_of_success_if_you_draw_none_of_the_bazaar_and_k_serum_powder = max(probability_mulligan_success, probability_powder_success)
-    probability_of_success += probability_no_bazaar_and_k_powder * probability_of_success_if_you_draw_none_of_the_bazaar_and_k_serum_powder
+    probability_of_success_if_you_draw_none_of_the_bazaar_and_k_serum_powder = \
+      max(probability_mulligan_success, probability_powder_success)
+    probability_of_success += \
+      probability_no_bazaar_and_k_powder * probability_of_success_if_you_draw_none_of_the_bazaar_and_k_serum_powder
 
   success_probabilities[(hand_size, powders_in_deck, library_size)] = probability_of_success
   return probability_of_success
 
 print success_probability(initial_hand_size, initial_powders_in_library, initial_library_size)
-print len(success_probabilities)
 
 """
 
@@ -125,4 +138,5 @@ appropriate number of fewer cards and serum powders.
 In any case this allows you to compute the answer for a given number
 of cards/serum powders/mulligans left in terms of the answers in
 situations where you have fewer of each. Thus you compute the answer
-starting with the lowest possible number of each and work your way up."""
+starting with the lowest possible number of each and work your way up.
+"""
