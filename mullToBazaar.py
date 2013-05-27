@@ -16,28 +16,37 @@ def choose(n, k):
         return 0
 
 def success_probability(hand_size, powders_in_deck, library_size):
+  if hand_size <=0:
+    return 0.0
+  if powders_in_deck <= -1:
+    return 0.0
+  if library_size <= 31:
+    return 0.0
   if (hand_size, powders_in_deck, library_size) in success_probabilities:
     return success_probabilities[(hand_size, powders_in_deck, library_size)]
+
+  probability_of_success =  0.0
+
   probability_draw_bazaar = 1.0 - (choose(library_size - 4, hand_size) * 1.0) / choose(library_size, hand_size)
 
-  probability_no_bazaar_and_k_powder = [0.0] * powders_in_deck
-  
+  probability_of_success += probability_draw_bazaar
+
   for powders_drawn in range(powders_in_deck + 1):
-    probability_no_bazaar_and_k_powder[powders_drawn] = choose(powders_in_deck, powders_drawn) * choose()
+    probability_no_bazaar_and_k_powder= (choose(powders_in_deck, powders_drawn) * 1.0) * \
+                                         (choose(library_size - powders_in_deck - 4, hand_size - powders_drawn) * 1.0 ) / \
+                                         (choose(library_size, hand_size) * 1.0)
 
-  probability_that_you_dont_and_draw_no_serum_powder = 0.0
-  probability_of_success_if_you_draw_none_of_the_bazaar_and_no_serum_powder = 0.0 
-  
-  probability_that_you_dont_and_draw_one_serum_powder = 0.0
-  probability_of_success_if_you_draw_none_of_the_bazaar_and_one_serum_powder = 0.0 
-  
-  probability_that_you_dont_and_draw_two_serum_powder = 0.0
-  probability_of_success_if_you_draw_none_of_the_bazaar_and_two_serum_powder = 0.0 
-  
-  probability_that_you_dont_and_draw_three_serum_powder = 0.0
-  probability_of_success_if_you_draw_none_of_the_bazaar_and_three_serum_powder = 0.0 
-  
-  probability_that_you_dont_and_draw_four_serum_powder = 0.0
-  probability_of_success_if_you_draw_none_of_the_bazaar_and_four_serum_powder = 0.0 
+    probability_mulligan_success = success_probability(hand_size - 1, powders_in_deck, library_size)                                                    
 
+    probability_power_success = success_probability(hand_size, powders_in_deck - powders_drawn, library_size - hand_size)
+
+    probability_of_success_if_you_draw_none_of_the_bazaar_and_k_serum_powder = max(probability_mulligan_success, probability_power_success)
+
+    probability_of_success+= (probability_no_bazaar_and_k_powder * probability_of_success_if_you_draw_none_of_the_bazaar_and_k_serum_powder)
+
+  success_probabilities[(hand_size, powders_in_deck, library_size)] = probability_of_success
+  return success_probabilities[(hand_size, powders_in_deck, library_size)]
+
+print success_probability(7, 4, 60)
+print len(success_probabilities)
   
