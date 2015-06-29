@@ -5,7 +5,9 @@ The following is an calculation of the probability of finding a
 Dredge Deck with 4 Serum Powders. This is combinatorial calculation, 
 not a randomized simulation.
 
-tl;dr Pr[Finding Bazaar] = 0.941681291934
+tl;dr Pr[Bazaar in opening hand] = 0.941681291934
+      Pr[Bazaar by turn 1 on draw] = 0.946103359759
+      Pr[Bazaar by turn 1 on draw with new mulligan rule] = 0.950266092187
 
 by Eugenio Fortanely
  """
@@ -14,6 +16,8 @@ initial_hand_size = 7
 initial_powders_in_library = 4
 initial_library_size = 60
 success_probabilities = {}
+new_mull_rule = True
+on_the_draw = True
 
 def choose(n, k):
     """
@@ -29,24 +33,28 @@ def choose(n, k):
         return ntok // ktok
     else:
         return 0
-
 def success_probability(hand_size, powders_in_deck, library_size):
   # if you've mulliganed to zero, you're done
   if hand_size <=0:
-    return 0.0
+      if new_mull_rule and on_the_draw:
+        return 1.0 - choose(library_size - 4, 2)*1.0/choose(library_size, 2)
+      elif on_the_draw:
+        return 1.0 - choose(library_size - 4, 1)*1.0/choose(library_size, 1)
+      else:
+          return 0.0
   # if you somehow have negative Serum Powders, you're done
   # this should never be true
   if powders_in_deck <= -1:
-    return 0.0
+      raise
   # if you've managed to exile more than 28 cards you're done
   # this should never be true
   if library_size <= 31:
-    return 0.0
+      raise
   # DP solution, memoize previous work
   if (hand_size, powders_in_deck, library_size) in success_probabilities:
     return success_probabilities[(hand_size, powders_in_deck, library_size)]
 
-  probability_of_success =  0.0
+  probability_of_success = 0.0
   num_possible_hands_without_bazaar = (choose(library_size - 4, hand_size) * 1.0)
   num_possible_hands = choose(library_size, hand_size)
   probability_draw_bazaar =  \
@@ -74,8 +82,24 @@ def success_probability(hand_size, powders_in_deck, library_size):
     ##    print "(hand_size, powders_in_deck, library_size)"
     ##    print (hand_size, powders_in_deck, library_size)
     ##    print "MULLIGAN"
+
+    if hand_size < initial_hand_size and new_mull_rule and on_the_draw:
+        probability_keep_success = 1.0 - choose(library_size - hand_size - 4, 2)*1.0/choose(library_size - hand_size, 2)
+    elif hand_size < initial_hand_size and on_the_draw:
+        probability_keep_success = 1.0 - choose(library_size - hand_size - 4, 1)*1.0/choose(library_size - hand_size, 1)
+    else:
+        probability_keep_success = 0.0
+    ##if probability_keep_success > probability_powder_success and powders_drawn > 0:
+    ##  print "(hand_size, powders_in_deck, library_size)"
+    ##  print (hand_size, powders_in_deck, library_size)
+    ##  print "probability_keep_success"
+    ##  print probability_keep_success
+    ##  print "probability_powder_success"
+    ##  print probability_powder_success
+
     probability_of_success_if_you_draw_none_of_the_bazaar_and_k_serum_powder = \
-      max(probability_mulligan_success, probability_powder_success)
+      max([probability_mulligan_success, probability_powder_success,
+          probability_keep_success])
     probability_of_success += \
       probability_no_bazaar_and_k_powder * probability_of_success_if_you_draw_none_of_the_bazaar_and_k_serum_powder
 
